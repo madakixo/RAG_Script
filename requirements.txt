@@ -1,11 +1,11 @@
+streamlit
 langchain
 langchain-community
-langchain-openai
+langchain-google-genai
 langchain-chroma
 chromadb
-openai
-tiktoken
 google-api-python-client
+google-auth
 google-auth-httplib2
 google-auth-oauthlib
 python-dotenv
