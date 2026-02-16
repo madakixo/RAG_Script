@@ -1,12 +1,13 @@
-# Hadith Corpus RAG Pipeline
+# Hadith Corpus RAG Pipeline (Gemini Edition)
 
-This project implements a Retrieval-Augmented Generation (RAG) pipeline that downloads a Hadith corpus from Google Drive, indexes it using OpenAI Embeddings and ChromaDB, and allows for semantic searching.
+This project implements a Retrieval-Augmented Generation (RAG) pipeline that downloads a Hadith corpus from Google Drive, indexes it using Google Gemini Embeddings and ChromaDB, and allows for semantic searching and answer generation using Gemini 1.5 Pro.
 
 ## Prerequisites
 
 - Python 3.8+
 - A Google Cloud Project with the Drive API enabled.
-- An OpenAI API Key.
+- A Google AI Studio API Key (for Gemini).
+- A Google Cloud Service Account JSON key.
 
 ## Setup
 
@@ -17,62 +18,39 @@ This project implements a Retrieval-Augmented Generation (RAG) pipeline that dow
     ```
 
 2. **Environment Variables**:
-    - Rename or copy `.env.example` (if provided) to `.env`.
-    - Edit `.env` and add your OpenAI API Key:
-
+    - Set your Google API Key:
+      ```bash
+      export GOOGLE_API_KEY=your-gemini-api-key
       ```
-      OPENAI_API_KEY=sk-your-key-here
+    - (Optional) Set your Service Account JSON as an environment variable:
+      ```bash
+      export GOOGLE_SERVICE_ACCOUNT_JSON='{"type": "service_account", ...}'
       ```
 
 3. **Google Drive Credentials**:
-    - Download your OAuth 2.0 Client IDs JSON file from the Google Cloud Console.
-    - Rename it to `credentials.json` and place it in this directory.
-    - *Note*: On the first run, a browser window will open to authorize access. A `token.pickle` file will be created for subsequent runs.
+    - Place your Service Account JSON file in this directory and rename it to `credentials.json`.
 
 ## Usage
 
-### 1. Indexing a File from Drive
+### 1. Streamlit Web App (Recommended)
 
-You need the **File ID** from Google Drive. You can get this from the sharing link (e.g., `https://drive.google.com/file/d/THIS_IS_THE_FILE_ID/view`).
-
-Run the pipeline:
+Run the Streamlit app for a web-based interface:
 
 ```bash
-python main.py <FILE_ID>
+streamlit run streamlit_app.py
 ```
 
-This will:
+### 2. CLI Tool
 
-1. Download the file associated with the ID.
-2. Save it locally as `corpus_data.txt` (default).
-3. Split the text into chunks.
-4. Generate embeddings and store them in `./chroma_db`.
-
-### 2. Custom Output Filename
-
-```bash
-python main.py <FILE_ID> --output my_hadith_book.pdf
-```
-
-*Supports .txt, .pdf, and .csv extensions.*
-
-### 3. Testing the Index (Querying)
-
-You can run a test query immediately after indexing:
+You can also run the pipeline from the command line:
 
 ```bash
 python main.py <FILE_ID> --query "What does the prophet say about fasting?"
 ```
 
-### 4. Querying an Existing Index
+## Features
 
-To query the index without re-downloading (create a separate script or just use the class):
-
-```python
-from indexer import RAGIndexer
-
-indexer = RAGIndexer() # Loads from ./chroma_db
-results = indexer.query("importance of prayer")
-for doc in results:
-    print(doc.page_content)
-```
+- **PDF Focus**: Optimized for indexing and searching PDF documents.
+- **Gemini Powered**: Uses `models/embedding-001` for embeddings and `gemini-1.5-pro` for RAG.
+- **Service Account Auth**: Seamless integration for cloud deployments (Google Cloud, Streamlit Cloud).
+- **Session-based Indexing**: The index is rebuilt each session to ensure data freshness and compatibility with ephemeral cloud storage.
